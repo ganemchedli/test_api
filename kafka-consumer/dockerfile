@@ -1,0 +1,5 @@
+# Final stage
+FROM openjdk:17-jdk-alpine
+WORKDIR /app
+COPY target/kafka-consumer-1.0-SNAPSHOT.jar .
+ENTRYPOINT ["java", "-jar", "kafka-consumer-1.0-SNAPSHOT.jar"]
