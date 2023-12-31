@@ -44,4 +44,24 @@
             <version>3.2.0</version> <!-- Use the same version as spark-core -->
         </dependency>
     </dependencies>
+    <build>
+    <plugins>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <mainClass>com.airquality.ApiTestMain</mainClass>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>java</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+
 </project>

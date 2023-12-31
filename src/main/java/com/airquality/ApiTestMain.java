@@ -1,9 +1,12 @@
-package com.airquality ;
+package com.airquality;
 
 import okhttp3.*;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.io.IOException;
-
+import java.util.Properties;
 
 public class ApiTestMain {
 
@@ -16,25 +19,28 @@ public class ApiTestMain {
                 .addHeader("accept", "application/json")
                 .build();
 
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    // Handle failure
-                    e.printStackTrace();
-                }
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+                System.out.println(responseBody);
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    // Handle successful response
-                    if (response.isSuccessful()) {
-                        // Use the response body as needed
-                        String responseBody = response.body().string();
-                        System.out.println(responseBody);
-                    } else {
-                        // Handle unsuccessful response
-                        System.out.println("Unsuccessful response: " + response.code() + " " + response.message());
-                    }
+                // Kafka producer configuration
+Properties properties = new Properties();
+properties.put("bootstrap.servers", "localhost:9092"); // Update this line
+properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+                try (Producer<String, String> producer = new KafkaProducer<>(properties)) {
+                    // Send the API response to Kafka topic
+                  // Send the API response to Kafka topic
+                  producer.send(new ProducerRecord<>("topic1", responseBody)); // Update this line
+
                 }
-            });
+            } else {
+                System.out.println("Unsuccessful response: " + response.code() + " " + response.message());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
